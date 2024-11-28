@@ -8,16 +8,16 @@ const { handleXadd, handleXrange, handleXread } = require('../implementation/str
 const {handleIncr, handleMulti, handleExec, handleMultiOnCmds} = require('../implementation/transaction');
 
 const requestHandler = (connection, data, config, multiOn) => {
-    if(multiOn){
-        handleMultiOnCmds(connection, data);
-        return toSimpleString('QUEUED');
-    }
     const cmds = data.toString().split('\r\n');
     // console.log('List of Commands:\n',cmds);
     const parsedCmds =  parseCommands(cmds);
     console.log('Cmds after RESP parsed:\n',parsedCmds);
     const cmdName = parsedCmds.cmdName;
     const args = parsedCmds.args;
+    if(multiOn && cmdName != 'EXEC'){
+        handleMultiOnCmds(connection, data);
+        return toSimpleString('QUEUED');
+    }
     switch (cmdName){
         // basic
         case 'PING':

@@ -58,8 +58,6 @@ const handleExec = (conn, config, args) =>{
     }
     else{
         const execResult = execQueue(conn);
-        console.log(execResult);
-        console.log(typeof execResult);
         return toRESP(execResult);
     }
 }
