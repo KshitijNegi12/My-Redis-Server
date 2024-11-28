@@ -81,11 +81,11 @@ const handlePropogation = (conn, data, config)=>{
         if(dataBack){
             if(typeof dataBack === 'object'){
                 dataBack.forEach(data => {
-                    connection.write(data);
+                    conn.write(data);
                 });
             }
             else{
-                connection.write(dataBack);
+                conn.write(dataBack);
             }
         }
         config.master_repl_offset += currQuery.length;
