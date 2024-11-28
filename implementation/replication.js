@@ -30,7 +30,7 @@ const handleReplconf = (config, args) =>{
     else if(args[0].toUpperCase() === 'ACK'){
         config.ack_count++;
         if(config.ack_count == config.connected_slaves.size){
-            config.wait_for_ack = false;
+            config.waiting_for_ack = false;
             config.ack_count = 0;
         }
     }
@@ -58,14 +58,13 @@ const handlePsync = (conn, config, args) =>{
 const handleWait = (config, args) =>{
     config.ack_count = 0;
     config.ack_needed = args[0];
-    config.wait_for_ack = false;
     // if no pending cmds to process, it means all replicas is sync and we don't need to wait
     if(config.propagation_count == 0){
-        config.wait_for_ack = true;
         return toRESP(config.connected_slaves.size);
     }
+    // if yes, then get the no. of replicas which are sync in given delay
     else{
-        // if yes, then get the no. of replicas which as sync in given delay
+        config.waiting_for_ack = true;
         const getAckMsg = toRESP(['REPLCONF','GETACK', '*']);
         config.connected_slaves.forEach(slave =>{
             slave.write(getAckMsg);
@@ -73,7 +72,7 @@ const handleWait = (config, args) =>{
     }
 
     setTimeout(()=>{
-        if(config.wait_for_ack){
+        if(config.waiting_for_ack){
             return toRESP(config.ack_count);
         }
         else{

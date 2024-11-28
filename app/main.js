@@ -12,7 +12,7 @@ const config = {
 	ack_count: 0,
 	ack_needed: 0,
 	propagation_count: 0, //pending cmds replica not ack yet
-	wait_for_ack: false,	// do server waiting for ack?
+	waiting_for_ack: false,	// is server, waiting for ack from replica?
 	cargs : new Map()
 }
 
