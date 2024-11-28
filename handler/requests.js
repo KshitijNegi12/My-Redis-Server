@@ -5,7 +5,7 @@ const {handlePing, handleEcho, handleSet, handleGet, handleType} = require('../i
 const {handleConfigGet, handleKeys} = require('../implementation/persistence');
 const { handleInfo, handleReplconf, handlePsync, handleWait } = require('../implementation/replication');
 const { handleXadd, handleXrange, handleXread } = require('../implementation/stream');
-const {handleIncr, handleMulti, handleExec, handleCmdsOnMulti} = require('../implementation/transaction');
+const {handleIncr, handleMulti, handleExec, handleCmdsOnMulti, handleDiscard} = require('../implementation/transaction');
 
 const requestHandler = (connection, data, config, multiOn) => {
     const cmds = data.toString().split('\r\n');
@@ -75,6 +75,9 @@ const handleCmds = (connection, config, cmdName, args) =>{
 
         case 'MULTI':
             return handleMulti(connection, config, args);
+        
+        case 'DISCARD':
+            return handleDiscard(connection, config, args);
 
         case 'EXEC':
             const allCmds = handleExec(connection, config, args);
@@ -91,7 +94,6 @@ const handleCmds = (connection, config, cmdName, args) =>{
                 }
 
             });
-            // console.log(result);
             return toRESP(result);
 
         default:

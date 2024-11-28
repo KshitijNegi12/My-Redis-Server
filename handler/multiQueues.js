@@ -23,4 +23,8 @@ const getQueuedCmds = (conn, config) =>{
     return allCmds;
 }
 
-module.exports = {isMultiOn, addConnToMultiQueue, addConnCmdsToQueue, getQueuedCmds};
+const discardQueueCmds = (conn, config) =>{
+    connWithMulti.delete(conn);
+}
+
+module.exports = {isMultiOn, addConnToMultiQueue, addConnCmdsToQueue, getQueuedCmds, discardQueueCmds};

@@ -1,7 +1,7 @@
 'use strict';
 const {storedKeys ,expiryKeys} = require('../store/cache');
 const {toRESP, toSimpleError, toSimpleString} = require('../resp/encode');
-const { addConnToMultiQueue, isMultiOn, addConnCmdsToQueue, getQueuedCmds } = require('../handler/multiQueues');
+const { addConnToMultiQueue, isMultiOn, addConnCmdsToQueue, getQueuedCmds, discardQueueCmds } = require('../handler/multiQueues');
 
 const handleIncr = (config, args) =>{
     const key = args[0];
@@ -61,4 +61,14 @@ const handleExec = (conn, config, args) =>{
     }
 }
 
-module.exports = {handleIncr, handleMulti, handleExec, handleCmdsOnMulti};
+const handleDiscard = (conn, config, args) =>{
+    if(!isMultiOn(conn)){
+        return toSimpleError('ERR DISCARD without MULTI');
+    }
+    else{
+        discardQueueCmds(conn, config);
+        return toSimpleString('OK');
+    }
+} 
+
+module.exports = {handleIncr, handleMulti, handleExec, handleCmdsOnMulti, handleDiscard};
