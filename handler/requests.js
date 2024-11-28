@@ -14,7 +14,8 @@ const requestHandler = (connection, data, config, multiOn) => {
     console.log('Cmds after RESP parsed:\n',parsedCmds);
     const cmdName = parsedCmds.cmdName;
     const args = parsedCmds.args;
-    if(multiOn && cmdName != 'EXEC'){
+    const notQueued = ['MULTI', 'EXEC', 'DISCARD'];
+    if(multiOn && !notQueued.includes(cmdName)){
         handleCmdsOnMulti(connection, cmdName, args);
         return toSimpleString('QUEUED');
     }
