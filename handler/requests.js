@@ -83,21 +83,22 @@ const handleCmds = (connection, config, cmdName, args) =>{
         case 'EXEC':
             const allCmds = handleExec(connection, config, args);
             if(typeof allCmds == 'string') return allCmds;
-            const result = [];
+            let result =`*${allCmds.length}\r\n`;
             allCmds.forEach(cmd => {
                 const execCmdName = cmd.cmdName;
                 const execArgs = cmd.args;
                 let cmdResult = handleCmds(connection, config, execCmdName, execArgs);
                 if(cmdResult){
                     cmdResult = cmdResult.split('\r\n');
-                    console.log(cmdResult);
-                    // console.log(parseRESP(cmdResult));
+                    // console.log(cmdResult);
                     cmdResult.pop();
-                    result.push(parseRESP(cmdResult)[0]);
+                    // console.log(cmdResult[0]);
+                    result = result + cmdResult[0] + '\r\n';
                 }
-
+                
             });
-            return toRESP(result);
+            console.log(result);
+            return result;
 
         default:
             return toSimpleError('Invalid Command!!');
