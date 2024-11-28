@@ -3,7 +3,7 @@ const {parseCommands} = require('../resp/decode');
 const {toSimpleError, toSimpleString} = require('../resp/encode');
 const {handlePing, handleEcho, handleSet, handleGet, handleType} = require('../implementation/basic');
 const {handleConfigGet, handleKeys} = require('../implementation/persistence');
-const { handleInfo, handleReplconf, handlePsync } = require('../implementation/replication');
+const { handleInfo, handleReplconf, handlePsync, handleWait } = require('../implementation/replication');
 const { handleXadd, handleXrange, handleXread } = require('../implementation/stream');
 const {handleIncr, handleMulti, handleExec, handleMultiOnCmds} = require('../implementation/transaction');
 
