@@ -31,7 +31,7 @@ const parseRESP = (cmds) => {
 				const integer = element.slice(1);
 				return [Number(integer), cmds];
 			default:
-				break;
+				return [element, cmds];
 		}
 	}
 };

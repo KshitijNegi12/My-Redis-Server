@@ -90,6 +90,8 @@ const handleCmds = (connection, config, cmdName, args) =>{
                 let cmdResult = handleCmds(connection, config, execCmdName, execArgs);
                 if(cmdResult){
                     cmdResult = cmdResult.split('\r\n');
+                    console.log(cmdResult);
+                    // console.log(parseRESP(cmdResult));
                     cmdResult.pop();
                     result.push(parseRESP(cmdResult)[0]);
                 }
