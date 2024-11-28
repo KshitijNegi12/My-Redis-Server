@@ -1,11 +1,11 @@
 'use strict';
-const {parseCommands} = require('../resp/decode');
-const {toSimpleError, toSimpleString} = require('../resp/encode');
+const {parseCommands, parseRESP} = require('../resp/decode');
+const {toSimpleError, toSimpleString, toRESP} = require('../resp/encode');
 const {handlePing, handleEcho, handleSet, handleGet, handleType} = require('../implementation/basic');
 const {handleConfigGet, handleKeys} = require('../implementation/persistence');
 const { handleInfo, handleReplconf, handlePsync, handleWait } = require('../implementation/replication');
 const { handleXadd, handleXrange, handleXread } = require('../implementation/stream');
-const {handleIncr, handleMulti, handleExec, handleMultiOnCmds} = require('../implementation/transaction');
+const {handleIncr, handleMulti, handleExec, handleCmdsOnMulti} = require('../implementation/transaction');
 
 const requestHandler = (connection, data, config, multiOn) => {
     const cmds = data.toString().split('\r\n');
@@ -15,9 +15,13 @@ const requestHandler = (connection, data, config, multiOn) => {
     const cmdName = parsedCmds.cmdName;
     const args = parsedCmds.args;
     if(multiOn && cmdName != 'EXEC'){
-        handleMultiOnCmds(connection, data);
+        handleCmdsOnMulti(connection, cmdName, args);
         return toSimpleString('QUEUED');
     }
+    return handleCmds(connection, config, cmdName, args);
+};
+
+const handleCmds = (connection, config, cmdName, args) =>{
     switch (cmdName){
         // basic
         case 'PING':
@@ -73,11 +77,25 @@ const requestHandler = (connection, data, config, multiOn) => {
             return handleMulti(connection, config, args);
 
         case 'EXEC':
-            return handleExec(connection, config, args);
+            const allCmds = handleExec(connection, config, args);
+            const result = [];
+            allCmds.forEach(cmd => {
+                const execCmdName = cmd.cmdName;
+                const execArgs = cmd.args;
+                let cmdResult = handleCmds(connection, config, execCmdName, execArgs);
+                if(cmdResult){
+                    cmdResult = cmdResult.split('\r\n');
+                    cmdResult.pop();
+                    result.push(parseRESP(cmdResult)[0]);
+                }
+
+            });
+            console.log(result);
+            return toRESP(result);
 
         default:
             return toSimpleError('Invalid Command!!');
     }
-};
+}
 
 module.exports = {requestHandler};

@@ -1,6 +1,6 @@
 'use strict';
 
-// connWithMulti(map) has conn(list) has cmds 
+// connWithMulti(map) has conn(list) has {cmdName, args}
 const connWithMulti = new Map();
 
 const isMultiOn = (conn) =>{
@@ -13,14 +13,14 @@ const addConnToMultiQueue = (conn) =>{
     return true;
 }
 
-const addConnCmdsToQueue = (conn, cmd) =>{
-    connWithMulti.get(conn).push(cmd);
+const addConnCmdsToQueue = (conn, cmdName, args) =>{
+    connWithMulti.get(conn).push({cmdName:cmdName, args:args});
 }
 
-const execQueue = (conn) =>{
-    let conns = [];
+const getQueuedCmds = (conn, config) =>{
+    const allCmds = connWithMulti.get(conn);
     connWithMulti.delete(conn);
-    return conns;
+    return allCmds;
 }
 
-module.exports = {isMultiOn, addConnToMultiQueue, addConnCmdsToQueue, execQueue};
+module.exports = {isMultiOn, addConnToMultiQueue, addConnCmdsToQueue, getQueuedCmds};
