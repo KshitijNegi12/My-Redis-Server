@@ -3,8 +3,8 @@ const {storedKeys ,expiryKeys, storedStreams} = require('../store/cache');
 const {toRESP, toSimpleString, toNullBulkString} = require('../resp/encode');
 
 const handlePing = (config) =>{
-    // if(config.role == 'master')
-    return toSimpleString('PONG');
+    if(config.role == 'master')
+        return toSimpleString('PONG');
 }
 
 const handleEcho = (config, args) =>{
