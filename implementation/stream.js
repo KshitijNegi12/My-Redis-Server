@@ -143,7 +143,8 @@ const handleXread = (conn, config, args) =>{
         // console.log('Updated Args: ',args);
         if(delay > 0){
             setTimeout(()=>{
-                return getXreadData(args); // streams + streamIds + IdFields
+                const result = getXreadData(args); // streams + streamIds + IdFields
+                conn.write(result);
             },delay);
         }
         // wait forever
