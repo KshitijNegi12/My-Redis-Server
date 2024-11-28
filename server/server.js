@@ -7,7 +7,9 @@ const {loadFile} = require('../implementation/persistence');
 
 const createServer = (config) =>{
     const server = net.createServer((connection) =>{
-        config.connections.add(connection);
+        if(config.role === 'master'){
+            config.connections.add(connection);
+        }
 
         connection.on('data', (data) =>{
             const dataToSendBack = requestHandler(connection, data, config, isMultiOn(connection));
