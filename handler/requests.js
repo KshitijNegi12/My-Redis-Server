@@ -78,6 +78,7 @@ const handleCmds = (connection, config, cmdName, args) =>{
 
         case 'EXEC':
             const allCmds = handleExec(connection, config, args);
+            if(typeof allCmds == 'string') return allCmds;
             const result = [];
             allCmds.forEach(cmd => {
                 const execCmdName = cmd.cmdName;
@@ -90,7 +91,7 @@ const handleCmds = (connection, config, cmdName, args) =>{
                 }
 
             });
-            console.log(result);
+            // console.log(result);
             return toRESP(result);
 
         default:
