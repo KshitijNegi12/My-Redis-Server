@@ -55,7 +55,7 @@ const handlePsync = (conn, config, args) =>{
     return result;
 }
 
-const handleWait = (config, args) =>{
+const handleWait = (conn, config, args) =>{
     config.ack_count = 0;
     config.ack_needed = args[0];
     // if no pending cmds to process, it means all replicas is sync and we don't need to wait
@@ -73,10 +73,10 @@ const handleWait = (config, args) =>{
 
     setTimeout(()=>{
         if(config.waiting_for_ack){
-            return toRESP(config.ack_count);
+            conn.write(toRESP(config.ack_count));
         }
         else{
-            return toRESP(config.connected_slaves.size);
+            conn.write(toRESP(config.connected_slaves.size));
         }
     },+args[1]);
 }

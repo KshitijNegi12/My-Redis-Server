@@ -5,6 +5,7 @@ const {toRESP} = require('../resp/encode');
 const {parseRESP} = require('../resp/decode');
 const {loadData} = require('../implementation/persistence');
 
+let gotRDBFile = false;
 const handShakeWithMaster = (config)=>{
 	console.log('Current In: Slave Mode');
 	const connToMaster = net.createConnection({ port: config.master_port, host: config.master_host });
@@ -38,14 +39,26 @@ const handShakeWithMaster = (config)=>{
         }
         else{
             // Handling propagation
-            console.log('Propogated Data');
-            handlePropogation(connToMaster, data, config);
+            if(gotRDBFile){
+                handlePropogation(connToMaster, data, config);
+            }
+            // in case if rdb file is transfered in stream of propagation
+            else{
+                handleRDBSnapshot(connToMaster, data, config);
+            }
         }
+    });
+
+    connToMaster.on('error', (err) =>{
+        console.log('Master Disconnected');
+        connToMaster.end();
     });
 }
 
 const handleRDBSnapshot = (conn, data, config)=>{
+    if(data.indexOf('$') === -1) return;
     // len + data
+    gotRDBFile = true;
     const concatBuff = data.slice(data.indexOf('$'));
     const rdbBuffLen = +concatBuff.toString().split('\r\n')[0].slice(1);
     const rdbBuffStart = concatBuff.indexOf('\n')+1;

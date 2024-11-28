@@ -53,7 +53,7 @@ const requestHandler = (connection, data, config, multiOn) => {
             return handlePsync(connection, config, args);
         
         case 'WAIT':
-            return handleWait(config, args);
+            return handleWait(connection, config, args);
 
         // stream
         case 'XADD':

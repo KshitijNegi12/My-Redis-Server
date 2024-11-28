@@ -26,18 +26,29 @@ const createServer = (config) =>{
         });
 
         connection.on('close', ()=>{
-            // console.log(config.connected_slaves, config.connections);
-            if(config.role === 'master'){
-                if(config.connected_slaves.has(connection)) config.connected_slaves.delete(connection);
-                if(config.connections.has(connection)) config.connections.delete(connection);
+            deleteConnFromServer(connection, config);
+        });
+
+        connection.on('error', (err) => {
+            if (err.code === 'ECONNRESET') {
+                deleteConnFromServer(connection, config);
+                console.log('Client disconnected abruptly.');
+            } else {
+                console.error('Socket error:', err);
             }
-            // console.log(config.connected_slaves, config.connections);
-        })
+        });
     });
 
     server.listen(config.port, config.host, ()=>{
         console.log(`Redis ${config.role} is listening on port: ${config.port}`);
     });
+}
+
+const deleteConnFromServer = (conn, config) =>{
+    if(config.role === 'master'){                    
+        if(config.connected_slaves.has(conn)) config.connected_slaves.delete(conn);
+        if(config.connections.has(conn)) config.connections.delete(conn);
+    }
 }
 
 const start = (config) =>{

@@ -40,7 +40,10 @@ const sendPropogationToReplicas = (data, config) =>{
     config.connected_slaves.forEach(slave =>{
         slave.write(data);
     });
-    config.propagation_count++;
+    
+    if(config.connected_slaves.size){
+        config.propagation_count++;
+    }
 }
 
 const handleGet = (config, args) =>{
