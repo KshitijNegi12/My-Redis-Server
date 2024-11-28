@@ -3,7 +3,8 @@
 // connWithBS(map) has streams(set) has connInfo(obj) has {conn, args}
 const connWithBS = new Map();
 
-const addConnToBS = (stream, conn, args) =>{
+const addConnToBS = (conn, args) =>{
+    const stream = args[0];
     const blockedConn = {
         conn: conn,
         args: args,
